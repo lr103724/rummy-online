@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  color: #fafafa;
+  min-height: 100vh;
+}
+
+/* ===== Simplified flat card ===== */
+.bicycle-card {
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Inter", Helvetica, Arial, sans-serif;
+  user-select: none;
+  padding: 0;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.card-red { color: #ec4899; }   /* bright pink for hearts/diamonds */
+.card-black { color: #111111; }
+
+/* ===== Card back ===== */
+.bicycle-back {
+  position: relative;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.bicycle-back-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background-color: #1e3a8a;
+  background-image:
+    repeating-linear-gradient(45deg,
+      rgba(255,255,255,0.16) 0 2px, transparent 2px 8px),
+    repeating-linear-gradient(-45deg,
+      rgba(255,255,255,0.16) 0 2px, transparent 2px 8px),
+    radial-gradient(circle at center,
+      rgba(255,255,255,0.25) 0 4px, transparent 5px 12px,
+      rgba(255,255,255,0.15) 13px 14px, transparent 15px 100%);
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+/* ===== Selection ===== */
+.selectable { transition: box-shadow 120ms ease, filter 120ms ease; }
+.selected {
+  outline: 3px solid #a3e635;   /* lime-400 */
+  outline-offset: 3px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+}
+
+/* ===== Stacked layouts ===== */
+.stack { display: flex; align-items: flex-end; }
+.stack > * + * { margin-left: -3.5rem; }       /* big-card fan: w-24=96px, -56px → 40px visible */
+.stack-discard { display: flex; align-items: flex-end; }
+.stack-discard > * + * { margin-left: -2.75rem; } /* medium-card fan: w-20=80px, -44px → 36px visible */
+.stack-small { display: flex; align-items: flex-end; }
+.stack-small > * + * { margin-left: -2.25rem; } /* meld fan: w-20=80px, -36px → 44px visible */
+
+/* ===== Background patterns (applied to body via BackgroundPicker) ===== */
+body { transition: background-color 240ms ease; }
+body.bg-pat-solid { background-image: none; }
+body.bg-pat-felt {
+  background-image:
+    repeating-linear-gradient(45deg,  rgba(255,255,255,0.05) 0 2px, transparent 2px 8px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 8px);
+}
+body.bg-pat-dots {
+  background-image: radial-gradient(rgba(255,255,255,0.10) 1.2px, transparent 1.5px);
+  background-size: 18px 18px;
+}
+body.bg-pat-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+body.bg-pat-diamonds {
+  background-image:
+    repeating-linear-gradient(45deg,  transparent 0 22px, rgba(255,255,255,0.12) 22px 23px),
+    repeating-linear-gradient(-45deg, transparent 0 22px, rgba(255,255,255,0.12) 22px 23px);
+}
+
+/* ===== Toasts ===== */
+.toast-enter { animation: toast-in 200ms ease both; }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
