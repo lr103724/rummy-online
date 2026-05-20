@@ -56,26 +56,29 @@ Session (`roomCode` + `playerId`) is persisted to `localStorage`. If you refresh
 
 ## Deploy
 
-### Server → Railway (or Render / Fly.io)
-1. Push this repo to GitHub.
-2. New Railway project → "Deploy from GitHub repo" → pick this repo.
-3. Set the **service root** to `/` (root of the monorepo). Railway will use [server/Dockerfile](server/Dockerfile) automatically if you point the service at the `server/` directory, or set the Dockerfile path manually.
-4. Set env vars:
-   - `PORT` — Railway provides this automatically.
-   - `HOST` — `0.0.0.0`
-   - `ALLOWED_ORIGINS` — your Vercel URL, e.g. `https://my-rummy.vercel.app`
-   - `LOG_LEVEL` — `info`
-5. Deploy. Confirm with `https://<your-app>.up.railway.app/health` → `{"ok":true,...}`.
+### Server → Render
+This repo includes a [`render.yaml`](render.yaml) blueprint, so the server is one-click via Render's dashboard.
+
+1. Push this repo to GitHub (already done if you're reading this on GitHub).
+2. Sign in at <https://dashboard.render.com> → **New +** → **Blueprint** → connect this repo.
+3. Render reads `render.yaml` and creates the `rummy-online-server` web service on the **Free** plan, using [`server/Dockerfile`](server/Dockerfile).
+4. After the first deploy succeeds, open the service in the dashboard → **Environment** → add:
+   - `ALLOWED_ORIGINS` = your Vercel URL (set this after the client is deployed; comma-separate if you have multiple).
+5. Trigger a manual redeploy so the new env var is picked up.
+6. Confirm `https://<your-service>.onrender.com/health` returns `{"ok":true,...}`.
+
+**Note on the Free plan:** Render spins the service down after 15 minutes of no HTTP traffic. The first player to connect at the start of a session will wait ~30 seconds for the cold start; everyone else joining within 15 minutes of the last activity is fast. Upgrade to the **Starter** plan ($7/mo) if you want always-on.
 
 ### Client → Vercel
-1. New Vercel project → import this repo.
+1. Sign in at <https://vercel.com/new> → import this GitHub repo.
 2. **Root directory:** `client`
-3. **Build command:** `pnpm install --frozen-lockfile=false && pnpm --filter @rummy/client build`
-4. **Output dir:** `dist`
-5. Env var: `VITE_SERVER_URL` = your Railway URL (e.g. `https://my-rummy.up.railway.app`).
-6. Deploy. SPA rewrites are configured in [client/vercel.json](client/vercel.json) so `/r/ABCD` resolves to the app.
+3. **Framework preset:** Vite (Vercel usually auto-detects)
+4. **Build command:** `cd .. && pnpm install --frozen-lockfile=false && pnpm --filter @rummy/client build`
+5. **Output directory:** `dist`
+6. **Environment variable:** `VITE_SERVER_URL` = your Render URL (e.g. `https://rummy-online-server.onrender.com`).
+7. Deploy. SPA rewrites are configured in [client/vercel.json](client/vercel.json) so `/r/ABCD` resolves correctly.
 
-After both are live, share `https://my-rummy.vercel.app` with friends.
+After both are live, set `ALLOWED_ORIGINS` on Render to the Vercel URL and redeploy. Share `https://<your-app>.vercel.app` with friends.
 
 ## Known limits / not yet built
 - No jokers, no high-ace runs, no opener point requirement.

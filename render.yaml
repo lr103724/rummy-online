@@ -1,0 +1,28 @@
+# Render Blueprint — auto-creates the server when you connect this repo
+# in the Render dashboard. Docs: https://render.com/docs/blueprint-spec
+#
+# Free plan caveat: the service sleeps after 15 minutes of no incoming HTTP
+# traffic. First connection of a play session takes ~30s to wake up; subsequent
+# connections are instant for the next 15 minutes after the last activity.
+
+services:
+  - type: web
+    name: rummy-online-server
+    runtime: docker
+    plan: free
+    region: oregon
+    rootDir: .
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: HOST
+        value: "0.0.0.0"
+      - key: LOG_LEVEL
+        value: info
+      - key: NODE_ENV
+        value: production
+      # ALLOWED_ORIGINS is set via the Render dashboard after the Vercel
+      # client URL is known. Example:
+      #   ALLOWED_ORIGINS=https://rummy-online.vercel.app
