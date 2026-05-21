@@ -100,7 +100,7 @@ export class RoomManager {
       roundNumber: 0,
       winningScore: clampScore(options.winningScore),
       aceHigh: !!options.aceHigh,
-      contextualAceScoring: !!options.contextualAceScoring,
+      simplifiedScoring: !!options.simplifiedScoring,
       numDecks: clampDecks(options.numDecks),
       startingHandSize: clampHandSize(options.startingHandSize),
       rummyWindowMs: clampWindow(options.rummyWindowMs),
@@ -441,7 +441,7 @@ export class RoomManager {
   private endRound(state: GameState, wentOutPlayerId: string | null) {
     const summary = computeRoundSummary(
       state.players, state.melds, state.roundNumber, wentOutPlayerId,
-      { contextualAceScoring: state.contextualAceScoring },
+      { simplifiedScoring: state.simplifiedScoring },
     );
     summary.perPlayer.forEach((row) => {
       const p = state.players.find((pp) => pp.id === row.playerId)!;

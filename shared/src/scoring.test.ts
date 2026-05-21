@@ -8,23 +8,45 @@ const c = (suit: 'H' | 'D' | 'C' | 'S', rank: Card['rank']): Card => ({
   rank,
 });
 
-describe('scoreCard', () => {
-  it('5 for 2-9', () => {
-    for (const r of ['2', '3', '4', '5', '6', '7', '8', '9'] as const) {
-      expect(scoreCard(r)).toBe(5);
-    }
+describe('scoreCard (regular / face-value mode)', () => {
+  it('2-9 score face value', () => {
+    expect(scoreCard('2')).toBe(2);
+    expect(scoreCard('5')).toBe(5);
+    expect(scoreCard('9')).toBe(9);
   });
-  it('10 for 10/J/Q/K', () => {
+  it('10/J/Q/K score 10', () => {
     for (const r of ['10', 'J', 'Q', 'K'] as const) expect(scoreCard(r)).toBe(10);
   });
-  it('15 for A', () => {
+  it('A scores 15 (in hand)', () => {
     expect(scoreCard('A')).toBe(15);
   });
 });
 
+describe('scoreCard (simplified mode)', () => {
+  it('2-9 all score 5', () => {
+    for (const r of ['2', '3', '4', '5', '6', '7', '8', '9'] as const) {
+      expect(scoreCard(r, { simplifiedScoring: true })).toBe(5);
+    }
+  });
+  it('10/J/Q/K still 10', () => {
+    for (const r of ['10', 'J', 'Q', 'K'] as const) {
+      expect(scoreCard(r, { simplifiedScoring: true })).toBe(10);
+    }
+  });
+  it('A in hand still 15', () => {
+    expect(scoreCard('A', { simplifiedScoring: true })).toBe(15);
+  });
+});
+
 describe('scoreCards', () => {
-  it('sums correctly', () => {
+  it('sums correctly with face-value defaults', () => {
+    // 15 + 10 + 5 = 30
     expect(scoreCards([c('H', 'A'), c('D', 'K'), c('S', '5')])).toBe(30);
+  });
+  it('sums correctly in simplified mode', () => {
+    // 15 + 10 + 5 = 30 (same here, but a 2 differs)
+    expect(scoreCards([c('H', '2'), c('D', '3')])).toBe(5);
+    expect(scoreCards([c('H', '2'), c('D', '3')], { simplifiedScoring: true })).toBe(10);
   });
 });
 
@@ -54,23 +76,21 @@ describe('scoreCardInMeld (ace context)', () => {
       { card: c('D', 'A'), placedBy: 'p' },
     ],
   };
-  it('default scoring: A always 15, even at low end of run', () => {
-    expect(scoreCardInMeld(c('S', 'A'), lowRun)).toBe(15);
+  it('regular mode: A is 1 in low run, 15 elsewhere', () => {
+    expect(scoreCardInMeld(c('S', 'A'), lowRun)).toBe(1);
     expect(scoreCardInMeld(c('S', 'A'), highRun)).toBe(15);
     expect(scoreCardInMeld(c('S', 'A'), set)).toBe(15);
   });
-  it('contextual scoring: A is 5 in a low-end run', () => {
-    expect(scoreCardInMeld(c('S', 'A'), lowRun, { contextualAceScoring: true })).toBe(5);
+  it('simplified mode: A is 5 in low run, 15 elsewhere', () => {
+    expect(scoreCardInMeld(c('S', 'A'), lowRun, { simplifiedScoring: true })).toBe(5);
+    expect(scoreCardInMeld(c('S', 'A'), highRun, { simplifiedScoring: true })).toBe(15);
+    expect(scoreCardInMeld(c('S', 'A'), set, { simplifiedScoring: true })).toBe(15);
   });
-  it('contextual scoring: A is 15 in a high-end run', () => {
-    expect(scoreCardInMeld(c('S', 'A'), highRun, { contextualAceScoring: true })).toBe(15);
-  });
-  it('contextual scoring: A is 15 in a set', () => {
-    expect(scoreCardInMeld(c('S', 'A'), set, { contextualAceScoring: true })).toBe(15);
-  });
-  it('non-ace cards use the standard table regardless of option', () => {
-    expect(scoreCardInMeld(c('S', '2'), lowRun)).toBe(5);
-    expect(scoreCardInMeld(c('S', 'K'), highRun, { contextualAceScoring: true })).toBe(10);
+  it('non-ace cards: face value by default, flat 5 in simplified mode', () => {
+    expect(scoreCardInMeld(c('S', '2'), lowRun)).toBe(2);
+    expect(scoreCardInMeld(c('S', '2'), lowRun, { simplifiedScoring: true })).toBe(5);
+    expect(scoreCardInMeld(c('S', 'K'), highRun)).toBe(10);
+    expect(scoreCardInMeld(c('S', 'K'), highRun, { simplifiedScoring: true })).toBe(10);
   });
 });
 
@@ -87,28 +107,39 @@ describe('computeRoundSummary', () => {
       cards: [
         { card: c('H', '7'), placedBy: 'p2' },
         { card: c('D', '7'), placedBy: 'p2' },
-        { card: c('C', '7'), placedBy: 'p1' }, // p1 also placed one
+        { card: c('C', '7'), placedBy: 'p1' },
       ],
     },
   ];
-  it('credits melds to whoever placed each card, penalizes hand when someone went out', () => {
+  it('regular (face-value) scoring credits melds and penalizes hand', () => {
     const s = computeRoundSummary(players, melds, 1, 'p2');
     const p1 = s.perPlayer.find((p) => p.playerId === 'p1')!;
     const p2 = s.perPlayer.find((p) => p.playerId === 'p2')!;
-    expect(p1.meldPoints).toBe(5); // one 7
-    expect(p1.handPenalty).toBe(5); // 4 in hand
+    expect(p1.meldPoints).toBe(7);    // one 7 at face value
+    expect(p1.handPenalty).toBe(4);   // H-4 in hand
+    expect(p1.delta).toBe(3);
+    expect(p1.totalScore).toBe(103);
+    expect(p2.meldPoints).toBe(14);   // two 7s
+    expect(p2.handPenalty).toBe(0);
+    expect(p2.delta).toBe(14);
+    expect(p2.totalScore).toBe(104);
+  });
+  it('simplified scoring uses flat 5s', () => {
+    const s = computeRoundSummary(players, melds, 1, 'p2', { simplifiedScoring: true });
+    const p1 = s.perPlayer.find((p) => p.playerId === 'p1')!;
+    const p2 = s.perPlayer.find((p) => p.playerId === 'p2')!;
+    expect(p1.meldPoints).toBe(5);
+    expect(p1.handPenalty).toBe(5);
     expect(p1.delta).toBe(0);
-    expect(p1.totalScore).toBe(100);
-    expect(p2.meldPoints).toBe(10); // two 7s
+    expect(p2.meldPoints).toBe(10);
     expect(p2.handPenalty).toBe(0);
     expect(p2.delta).toBe(10);
-    expect(p2.totalScore).toBe(100);
   });
   it('skips hand penalty when stock ran out', () => {
     const s = computeRoundSummary(players, melds, 1, null);
     const p1 = s.perPlayer.find((p) => p.playerId === 'p1')!;
     expect(p1.handPenalty).toBe(0);
-    expect(p1.delta).toBe(5);
+    expect(p1.delta).toBe(7); // meld only, face value
   });
 });
 

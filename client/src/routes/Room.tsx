@@ -69,7 +69,7 @@ export function Room() {
               Ace: {state.aceHigh ? 'high or low' : 'low only'}
             </span>
             <span className="px-2 py-1 rounded bg-zinc-800 border border-zinc-600">
-              Ace scoring: {state.contextualAceScoring ? 'contextual (5 / 15)' : 'always 15'}
+              Scoring: {state.simplifiedScoring ? 'simplified (flat 5/10/15)' : 'standard (face value)'}
             </span>
             <span className="px-2 py-1 rounded bg-zinc-800 border border-zinc-600">
               Decks: {state.numDecks}

@@ -50,9 +50,10 @@ export interface RoomOptions {
   rummyWindowMs: number;
   /** If true, ace can be high in runs (e.g. Q-K-A). Default false. */
   aceHigh: boolean;
-  /** If true, an Ace at the LOW end of a run (A-2-3 …) scores 5 instead of 15.
-   *  Aces in sets and high-end runs always score 15. Default false (ace = 15 everywhere). */
-  contextualAceScoring: boolean;
+  /** Simplified vs face-value scoring:
+   *    false (default, "regular"): 2-9 = face value (2, 3, ..., 9), 10/J/Q/K = 10, Ace = 1 in low run / 15 elsewhere.
+   *    true ("simplified"):        2-9 = flat 5,                10/J/Q/K = 10, Ace = 5 in low run / 15 elsewhere. */
+  simplifiedScoring: boolean;
   /** How many full 52-card decks to shuffle together. 1 or 2. Default 1. */
   numDecks: number;
   /** Cards dealt per player at the start of each round. 0 = automatic (13 for 2 players, 7 for 3+). */
@@ -63,7 +64,7 @@ export const DEFAULT_OPTIONS: RoomOptions = {
   winningScore: 500,
   rummyWindowMs: 3000,
   aceHigh: false,
-  contextualAceScoring: false,
+  simplifiedScoring: false,
   numDecks: 1,
   startingHandSize: 0,
 };
@@ -82,7 +83,7 @@ export interface GameState {
   roundNumber: number;
   winningScore: number;
   aceHigh: boolean;
-  contextualAceScoring: boolean;
+  simplifiedScoring: boolean;
   numDecks: number;
   startingHandSize: number;
   /** Timestamp (ms) of the most recent discard, used for the rummy-call window. */
@@ -131,7 +132,7 @@ export interface ClientGameState {
   roundNumber: number;
   winningScore: number;
   aceHigh: boolean;
-  contextualAceScoring: boolean;
+  simplifiedScoring: boolean;
   numDecks: number;
   startingHandSize: number;
   lastDiscardAt?: number;

@@ -142,9 +142,9 @@ describe('RoomManager game flow', () => {
     expect(v.lastRoundSummary).toBeDefined();
     const aSum = v.lastRoundSummary!.perPlayer.find((p) => p.playerId === a.playerId)!;
     const bSum = v.lastRoundSummary!.perPlayer.find((p) => p.playerId === b.playerId)!;
-    expect(aSum.meldPoints).toBe(15); // three 9s = 5*3
+    expect(aSum.meldPoints).toBe(27); // three 9s, face value 9*3
     expect(aSum.handPenalty).toBe(0);
-    expect(aSum.delta).toBe(15);
+    expect(aSum.delta).toBe(27);
     expect(bSum.handPenalty).toBe(10 + 15); // K + A
     expect(bSum.delta).toBe(-25);
   });

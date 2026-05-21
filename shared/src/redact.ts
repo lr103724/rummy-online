@@ -23,7 +23,7 @@ export function redactFor(state: GameState, playerId: string): ClientGameState {
     roundNumber: state.roundNumber,
     winningScore: state.winningScore,
     aceHigh: state.aceHigh,
-    contextualAceScoring: state.contextualAceScoring,
+    simplifiedScoring: state.simplifiedScoring,
     numDecks: state.numDecks,
     startingHandSize: state.startingHandSize,
     lastDiscardAt: state.lastDiscardAt,

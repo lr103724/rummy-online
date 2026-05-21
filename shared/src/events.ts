@@ -29,7 +29,7 @@ export interface RoomCreatePayload {
   winningScore?: number;
   rummyWindowMs?: number;
   aceHigh?: boolean;
-  contextualAceScoring?: boolean;
+  simplifiedScoring?: boolean;
   numDecks?: number;
   startingHandSize?: number;
 }

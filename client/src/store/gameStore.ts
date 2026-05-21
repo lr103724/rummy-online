@@ -20,7 +20,7 @@ interface State {
   pushToast(t: Omit<Toast, 'id'>): void;
   dismissToast(id: number): void;
   attachListeners(): void;
-  createRoom(name: string, opts?: { winningScore?: number; rummyWindowMs?: number; aceHigh?: boolean; contextualAceScoring?: boolean; numDecks?: number; startingHandSize?: number }): Promise<{ roomCode: string; playerId: string }>;
+  createRoom(name: string, opts?: { winningScore?: number; rummyWindowMs?: number; aceHigh?: boolean; simplifiedScoring?: boolean; numDecks?: number; startingHandSize?: number }): Promise<{ roomCode: string; playerId: string }>;
   joinRoom(roomCode: string, name: string): Promise<{ roomCode: string; playerId: string }>;
   rejoinRoom(roomCode: string, playerId: string): Promise<void>;
   startGame(): void;

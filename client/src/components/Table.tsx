@@ -304,7 +304,7 @@ export function Table(props: Props) {
           2. Meld sets/runs or lay off (optional).<br />
           3. Discard one card.<br />
           <br />
-          Sets = 3+ same rank. Runs = 3+ same suit, consecutive (A low only). Score: 2-9 → 5, 10-K → 10, A → 15. First to {state.winningScore} wins.
+          Sets = 3+ same rank. Runs = 3+ same suit, consecutive. Score: {state.simplifiedScoring ? '2-9 → 5, 10-K → 10, A → 5/15' : '2-9 → face value, 10-K → 10, A → 1/15'}. First to {state.winningScore} wins.
         </div>
       </div>
     </div>

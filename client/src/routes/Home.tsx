@@ -21,7 +21,7 @@ export function Home() {
   const [winningScore, setWinningScore] = useState(500);
   const [rummyWindowMs, setRummyWindowMs] = useState(3000);
   const [aceHigh, setAceHigh] = useState(false);
-  const [contextualAceScoring, setContextualAceScoring] = useState(false);
+  const [simplifiedScoring, setSimplifiedScoring] = useState(false);
   const [numDecks, setNumDecks] = useState(1);
   const [startingHandSize, setStartingHandSize] = useState(0); // 0 = auto
 
@@ -37,7 +37,7 @@ export function Home() {
     try {
       setBusy(true);
       const { roomCode } = await create(myName.trim(), {
-        winningScore, rummyWindowMs, aceHigh, contextualAceScoring, numDecks, startingHandSize,
+        winningScore, rummyWindowMs, aceHigh, simplifiedScoring, numDecks, startingHandSize,
       });
       navigate(`/r/${roomCode}`);
     } catch (e: any) { setError(e?.message ?? 'Failed'); }
@@ -209,13 +209,14 @@ export function Home() {
                 <input
                   type="checkbox"
                   className="mt-1 accent-amber-400"
-                  checked={contextualAceScoring}
-                  onChange={(e) => setContextualAceScoring(e.target.checked)}
+                  checked={simplifiedScoring}
+                  onChange={(e) => setSimplifiedScoring(e.target.checked)}
                 />
                 <div>
-                  <div className="text-sm">Simplified ace scoring</div>
+                  <div className="text-sm">Simplified scoring</div>
                   <div className="text-[11px] text-zinc-400">
-                    Ace = 5 at the low end of a run (A-2-3 …). Otherwise 15. Default: ace is always 15.
+                    <span className="font-semibold">On:</span> 2–9 each = 5, 10/J/Q/K = 10, Ace = 5 in low run / 15 elsewhere.<br />
+                    <span className="font-semibold">Off (default):</span> 2–9 = face value, 10/J/Q/K = 10, Ace = 1 in low run / 15 elsewhere.
                   </div>
                 </div>
               </label>

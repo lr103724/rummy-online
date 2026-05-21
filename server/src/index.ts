@@ -73,7 +73,7 @@ async function main() {
           winningScore: payload?.winningScore,
           rummyWindowMs: payload?.rummyWindowMs,
           aceHigh: payload?.aceHigh,
-          contextualAceScoring: payload?.contextualAceScoring,
+          simplifiedScoring: payload?.simplifiedScoring,
           numDecks: payload?.numDecks,
           startingHandSize: payload?.startingHandSize,
         });
