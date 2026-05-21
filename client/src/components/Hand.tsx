@@ -46,7 +46,9 @@ export function Hand({ cards, selectedIds, onToggle }: Props) {
     return SUIT_ORDER[a.suit]! - SUIT_ORDER[b.suit]!;
   });
 
-  const SHIFT = 36;
+  // Neighbors slide far enough to clear the hovered card's full width (96px cards
+  // overlap by 56px; sliding by 60 fully exposes the hovered card on both sides).
+  const SHIFT = 60;
 
   return (
     <div className="flex flex-col items-center gap-1">

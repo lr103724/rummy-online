@@ -158,14 +158,34 @@ export function Table(props: Props) {
           <TurnIndicator state={state} myId={myId} />
         </div>
 
-        {/* Other players — fixed */}
+        {/* Other players — name + score + fanned card backs to show hand size */}
         <div className="shrink-0 flex gap-3 flex-wrap">
-          {state.players.filter((p) => p.id !== myId).map((p) => (
-            <div key={p.id} className={`rounded border border-zinc-600 px-3 py-1.5 bg-feltDark/70 ${state.players[state.turnIndex]?.id === p.id ? 'ring-2 ring-amber-300' : ''}`}>
-              <div className="text-sm font-medium">{p.name}{!p.connected && <span className="text-rose-400 ml-1">(off)</span>}</div>
-              <div className="text-xs text-zinc-400">{p.handCount} cards · {p.totalScore} pts</div>
-            </div>
-          ))}
+          {state.players.filter((p) => p.id !== myId).map((p) => {
+            const visible = Math.min(p.handCount, 13);
+            const isTurn = state.players[state.turnIndex]?.id === p.id;
+            return (
+              <div
+                key={p.id}
+                className={`rounded border border-zinc-600 px-3 py-1.5 bg-feltDark/70 flex items-center gap-3 ${isTurn ? 'ring-2 ring-amber-300' : ''}`}
+              >
+                <div>
+                  <div className="text-sm font-medium">{p.name}{!p.connected && <span className="text-rose-400 ml-1">(off)</span>}</div>
+                  <div className="text-xs text-zinc-400">{p.handCount} cards · {p.totalScore} pts</div>
+                </div>
+                <div className="flex" aria-label={`${p.name}'s hand: ${p.handCount} cards`}>
+                  {Array.from({ length: visible }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="bicycle-back-mini"
+                      style={{ marginLeft: i === 0 ? 0 : '-10px', zIndex: i }}
+                    >
+                      <div className="bicycle-back-inner" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Melds — flex-grow, auto-fits via transform: scale() if it would otherwise wrap too much */}

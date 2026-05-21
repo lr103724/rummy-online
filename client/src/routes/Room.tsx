@@ -4,6 +4,7 @@ import { useGame, loadSavedSession } from '../store/gameStore';
 import { Table } from '../components/Table';
 import { ToastStack } from '../components/Toast';
 import { LayoutProvider } from '../components/Flip';
+import { Confetti } from '../components/Confetti';
 
 export function Room() {
   const { roomCode = '' } = useParams<{ roomCode: string }>();
@@ -123,6 +124,15 @@ export function Room() {
         onDiscard={discard}
         onCallRummy={callRummy}
       />
+      {(state.phase === 'roundEnd' || state.phase === 'gameEnd') && state.lastRoundSummary && (
+        (state.lastRoundSummary.wentOut === myId
+          || (state.phase === 'gameEnd' && state.winnerId === myId))
+          ? <Confetti
+              count={state.phase === 'gameEnd' && state.winnerId === myId ? 140 : 70}
+              burstKey={`${state.roundNumber}-${state.phase}`}
+            />
+          : null
+      )}
       {(state.phase === 'roundEnd' || state.phase === 'gameEnd') && state.lastRoundSummary && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-40">
           <div className="bg-feltDark border border-zinc-600 rounded-lg p-6 max-w-md w-full space-y-3">

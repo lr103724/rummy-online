@@ -298,6 +298,13 @@ export class RoomManager {
     } else {
       const kind = inferMeldKind(meldCards, opts);
       if (!kind) throw new RoomError('NOT_A_MELD', 'Selected cards are not a valid set or run');
+      // Boathouse pre-check before committing the new meld: if this draw would empty
+      // the player's hand, block it under boathouse and allow + go out otherwise.
+      const meldIdSetCheck = new Set(meldCardIds);
+      const wouldBeEmpty = virtual.every((c) => meldIdSetCheck.has(c.id));
+      if (state.boathouseRule && wouldBeEmpty) {
+        throw new RoomError('BOATHOUSE', 'Boathouse rule: must keep at least one card to discard');
+      }
       const placed = meldCards.map((c) => ({ card: c, placedBy: playerId }));
       state.melds.push({
         id: generateMeldId(),
@@ -314,6 +321,12 @@ export class RoomManager {
     const survivors = virtual.filter((c) => !meldIdSet.has(c.id));
     player.hand = survivors;
 
+    // Going out: drawDiscard + meld can empty the hand. End the round here.
+    if (player.hand.length === 0) {
+      this.endRound(state, playerId);
+      this.touch(state);
+      return;
+    }
     state.phase = 'meld';
     this.touch(state);
   }
