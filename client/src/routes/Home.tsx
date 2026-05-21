@@ -24,6 +24,7 @@ export function Home() {
   const [simplifiedScoring, setSimplifiedScoring] = useState(false);
   const [numDecks, setNumDecks] = useState(1);
   const [startingHandSize, setStartingHandSize] = useState(0); // 0 = auto
+  const [boathouseRule, setBoathouseRule] = useState(false);
 
   useEffect(() => {
     attach();
@@ -37,7 +38,7 @@ export function Home() {
     try {
       setBusy(true);
       const { roomCode } = await create(myName.trim(), {
-        winningScore, rummyWindowMs, aceHigh, simplifiedScoring, numDecks, startingHandSize,
+        winningScore, rummyWindowMs, aceHigh, simplifiedScoring, numDecks, startingHandSize, boathouseRule,
       });
       navigate(`/r/${roomCode}`);
     } catch (e: any) { setError(e?.message ?? 'Failed'); }
@@ -217,6 +218,22 @@ export function Home() {
                   <div className="text-[11px] text-zinc-400">
                     <span className="font-semibold">On:</span> 2–9 each = 5, 10/J/Q/K = 10, Ace = 5 in low run / 15 elsewhere.<br />
                     <span className="font-semibold">Off (default):</span> 2–9 = face value, 10/J/Q/K = 10, Ace = 1 in low run / 15 elsewhere.
+                  </div>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-1 accent-amber-400"
+                  checked={boathouseRule}
+                  onChange={(e) => setBoathouseRule(e.target.checked)}
+                />
+                <div>
+                  <div className="text-sm">Boathouse rule</div>
+                  <div className="text-[11px] text-zinc-400">
+                    When on, you must <span className="font-semibold">discard</span> on the turn you go out — you
+                    can't end the round by melding or laying off your last card. Off (default) lets you go out any way.
                   </div>
                 </div>
               </label>

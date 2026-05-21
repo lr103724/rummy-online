@@ -77,6 +77,9 @@ export function Room() {
             <span className="px-2 py-1 rounded bg-zinc-800 border border-zinc-600">
               Hand: {state.startingHandSize === 0 ? 'auto' : state.startingHandSize}
             </span>
+            <span className="px-2 py-1 rounded bg-zinc-800 border border-zinc-600">
+              Boathouse: {state.boathouseRule ? 'on' : 'off'}
+            </span>
           </div>
           <div>
             <div className="text-xs uppercase text-zinc-400 mb-1">Players ({state.players.length}/6)</div>

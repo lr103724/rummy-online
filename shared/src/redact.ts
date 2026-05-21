@@ -26,6 +26,7 @@ export function redactFor(state: GameState, playerId: string): ClientGameState {
     simplifiedScoring: state.simplifiedScoring,
     numDecks: state.numDecks,
     startingHandSize: state.startingHandSize,
+    boathouseRule: state.boathouseRule,
     lastDiscardAt: state.lastDiscardAt,
     rummyWindowMs: state.rummyWindowMs,
     lastRoundSummary: state.lastRoundSummary,

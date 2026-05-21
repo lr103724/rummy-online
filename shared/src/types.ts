@@ -58,6 +58,9 @@ export interface RoomOptions {
   numDecks: number;
   /** Cards dealt per player at the start of each round. 0 = automatic (13 for 2 players, 7 for 3+). */
   startingHandSize: number;
+  /** Boathouse rule: when on, you must discard on the turn you go out.
+   *  You can't meld or lay off your last card. Default: off (more permissive). */
+  boathouseRule: boolean;
 }
 
 export const DEFAULT_OPTIONS: RoomOptions = {
@@ -67,6 +70,7 @@ export const DEFAULT_OPTIONS: RoomOptions = {
   simplifiedScoring: false,
   numDecks: 1,
   startingHandSize: 0,
+  boathouseRule: false,
 };
 
 export interface GameState {
@@ -86,6 +90,7 @@ export interface GameState {
   simplifiedScoring: boolean;
   numDecks: number;
   startingHandSize: number;
+  boathouseRule: boolean;
   /** Timestamp (ms) of the most recent discard, used for the rummy-call window. */
   lastDiscardAt?: number;
   /** Length (ms) of the rummy call window after each discard. */
@@ -135,6 +140,7 @@ export interface ClientGameState {
   simplifiedScoring: boolean;
   numDecks: number;
   startingHandSize: number;
+  boathouseRule: boolean;
   lastDiscardAt?: number;
   rummyWindowMs: number;
   lastRoundSummary?: RoundSummary;

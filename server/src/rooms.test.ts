@@ -98,6 +98,21 @@ describe('RoomManager game flow', () => {
     expect(v2.turnIndex).toBe(1);
   });
 
+  it('with boathouseRule on, melding the entire hand is blocked', () => {
+    const { mgr } = makeMgr();
+    const a = mgr.createRoom('A', { boathouseRule: true });
+    mgr.joinRoom(a.roomCode, 'B');
+    mgr.startGame(a.roomCode, a.playerId);
+    const raw = mgr.getRawState(a.roomCode)!;
+    raw.players[0]!.hand = [
+      { id: 'H-7-1', suit: 'H', rank: '7' },
+      { id: 'D-7-1', suit: 'D', rank: '7' },
+      { id: 'C-7-1', suit: 'C', rank: '7' },
+    ];
+    raw.phase = 'meld';
+    expect(() => mgr.meld(a.roomCode, a.playerId, ['H-7-1', 'D-7-1', 'C-7-1'])).toThrow(/BOATHOUSE/);
+  });
+
   it('going out by melding the entire hand ends the round', () => {
     const { mgr } = makeMgr();
     const a = mgr.createRoom('A');

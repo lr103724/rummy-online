@@ -104,6 +104,7 @@ export class RoomManager {
       simplifiedScoring: !!options.simplifiedScoring,
       numDecks: clampDecks(options.numDecks),
       startingHandSize: clampHandSize(options.startingHandSize),
+      boathouseRule: !!options.boathouseRule,
       rummyWindowMs: clampWindow(options.rummyWindowMs),
       createdAt: nowMs(),
       updatedAt: nowMs(),
@@ -325,6 +326,9 @@ export class RoomManager {
     const cards = pickCardsByIds(player.hand, cardIds);
     if (!cards) throw new RoomError('BAD_CARDS', 'Cards not in hand');
     if (cards.length === 0) throw new RoomError('EMPTY', 'No cards selected');
+    if (state.boathouseRule && cards.length >= player.hand.length) {
+      throw new RoomError('BOATHOUSE', 'Boathouse rule: must keep at least one card to discard');
+    }
 
     const opts = this.ruleOpts(state);
     if (targetMeldId) {
@@ -364,6 +368,9 @@ export class RoomManager {
     const player = this.currentPlayer(state);
     const card = player.hand.find((c) => c.id === cardId);
     if (!card) throw new RoomError('BAD_CARDS', 'Card not in hand');
+    if (state.boathouseRule && player.hand.length <= 1) {
+      throw new RoomError('BOATHOUSE', 'Boathouse rule: must keep at least one card to discard');
+    }
     const meld = state.melds.find((m) => m.id === meldId);
     if (!meld) throw new RoomError('NO_MELD', 'Meld not found');
     if (!canLayOff(card, meld, this.ruleOpts(state))) throw new RoomError('CANT_LAYOFF', 'Card does not extend this meld');

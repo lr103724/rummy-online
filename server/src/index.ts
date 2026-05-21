@@ -76,6 +76,7 @@ async function main() {
           simplifiedScoring: payload?.simplifiedScoring,
           numDecks: payload?.numDecks,
           startingHandSize: payload?.startingHandSize,
+          boathouseRule: payload?.boathouseRule,
         });
         sock.data.roomCode = roomCode;
         sock.data.playerId = playerId;

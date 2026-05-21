@@ -32,6 +32,7 @@ export interface RoomCreatePayload {
   simplifiedScoring?: boolean;
   numDecks?: number;
   startingHandSize?: number;
+  boathouseRule?: boolean;
 }
 export interface RoomJoinPayload { roomCode: string; name: string; }
 export interface RoomRejoinPayload { roomCode: string; playerId: string; }
