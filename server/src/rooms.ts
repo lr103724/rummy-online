@@ -16,6 +16,7 @@ import {
   removeCardsFromHand,
   RoomOptions,
   shuffle,
+  sortRunCards,
 } from '@rummy/shared';
 import { generateMeldId, generatePlayerId, generateRoomCode } from './lib/ids.js';
 
@@ -296,11 +297,12 @@ export class RoomManager {
     } else {
       const kind = inferMeldKind(meldCards, opts);
       if (!kind) throw new RoomError('NOT_A_MELD', 'Selected cards are not a valid set or run');
+      const placed = meldCards.map((c) => ({ card: c, placedBy: playerId }));
       state.melds.push({
         id: generateMeldId(),
         ownerId: playerId,
         kind,
-        cards: meldCards.map((c) => ({ card: c, placedBy: playerId })),
+        cards: kind === 'run' ? sortRunCards(placed) : placed,
       });
     }
 
@@ -323,10 +325,6 @@ export class RoomManager {
     const cards = pickCardsByIds(player.hand, cardIds);
     if (!cards) throw new RoomError('BAD_CARDS', 'Cards not in hand');
     if (cards.length === 0) throw new RoomError('EMPTY', 'No cards selected');
-    // Boathouse: must keep at least one card to discard.
-    if (cards.length >= player.hand.length) {
-      throw new RoomError('BOATHOUSE', 'Must keep at least one card to discard');
-    }
 
     const opts = this.ruleOpts(state);
     if (targetMeldId) {
@@ -342,15 +340,20 @@ export class RoomManager {
     } else {
       const kind = inferMeldKind(cards, opts);
       if (!kind) throw new RoomError('NOT_A_MELD', 'Selected cards are not a valid set or run');
+      const placed = cards.map((c) => ({ card: c, placedBy: playerId }));
       state.melds.push({
         id: generateMeldId(),
         ownerId: playerId,
         kind,
-        cards: cards.map((c) => ({ card: c, placedBy: playerId })),
+        cards: kind === 'run' ? sortRunCards(placed) : placed,
       });
     }
 
     player.hand = removeCardsFromHand(player.hand, cardIds);
+    // Going out: if melding away the entire hand, end the round here.
+    if (player.hand.length === 0) {
+      this.endRound(state, playerId);
+    }
     this.touch(state);
   }
 
@@ -361,7 +364,6 @@ export class RoomManager {
     const player = this.currentPlayer(state);
     const card = player.hand.find((c) => c.id === cardId);
     if (!card) throw new RoomError('BAD_CARDS', 'Card not in hand');
-    if (player.hand.length <= 1) throw new RoomError('BOATHOUSE', 'Must keep at least one card to discard');
     const meld = state.melds.find((m) => m.id === meldId);
     if (!meld) throw new RoomError('NO_MELD', 'Meld not found');
     if (!canLayOff(card, meld, this.ruleOpts(state))) throw new RoomError('CANT_LAYOFF', 'Card does not extend this meld');
@@ -370,6 +372,10 @@ export class RoomManager {
     const idx = state.melds.findIndex((m) => m.id === meld.id);
     state.melds[idx] = newMeld;
     player.hand = removeCardsFromHand(player.hand, [cardId]);
+    // Going out by lay-off: end the round if this was the player's last card.
+    if (player.hand.length === 0) {
+      this.endRound(state, playerId);
+    }
     this.touch(state);
   }
 

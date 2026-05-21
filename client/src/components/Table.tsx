@@ -29,30 +29,28 @@ export function Table(props: Props) {
    *  (the rest go to the hand). Deepest is always included and locked. */
   const [selectedTakenIds, setSelectedTakenIds] = useState<Set<string>>(new Set());
 
-  // Auto-fit the melds panel: if the natural meld grid is taller than its container,
-  // scale it down (and widen the logical layout) so it fills the available space
-  // without scrolling. Bounded below by 0.55× — beyond that, scrolling kicks in.
+  // Auto-fit the melds panel: shrink the grid only when its NATURAL content height
+  // exceeds a threshold (two-ish rows of small cards). Container resizes (e.g. the
+  // discard prompt appearing) don't cause shrinking — only meld content does.
   const meldsScaleRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const inner = meldsScaleRef.current;
-    const outer = inner?.parentElement;
-    if (!inner || !outer) return;
+    if (!inner) return;
+    const MAX_NATURAL_H = 320; // ~2 rows of small cards + labels
     const update = () => {
       inner.style.transform = '';
       inner.style.width = '';
-      const outerH = outer.clientHeight;
       const naturalH = inner.scrollHeight;
-      if (naturalH > outerH && outerH > 0) {
-        const scale = Math.max(0.55, outerH / naturalH);
+      if (naturalH > MAX_NATURAL_H) {
+        const scale = Math.max(0.55, MAX_NATURAL_H / naturalH);
         inner.style.transform = `scale(${scale})`;
         inner.style.transformOrigin = 'top left';
         inner.style.width = `${100 / scale}%`;
       }
     };
     update();
-    const ro = new ResizeObserver(update);
-    ro.observe(outer);
-    return () => ro.disconnect();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
   }, [state.melds]);
 
   const toggleSelect = (id: string) => {

@@ -115,6 +115,19 @@ export function findLayOffTarget(card: Card, melds: Meld[], opts?: RuleOpts): Me
   return null;
 }
 
+/** Sort an array of meld-card entries into run order, respecting ace orientation
+ *  (ace is high if the cards form a high-ace consecutive run, low otherwise). */
+export function sortRunCards<T extends { card: Card }>(cards: T[]): T[] {
+  const orient = runOrientation(cards.map((c) => c.card)) ?? { aceHigh: false };
+  const out = [...cards];
+  out.sort((a, b) => {
+    const av = a.card.rank === 'A' && orient.aceHigh ? 14 : RANK_ORDER[a.card.rank];
+    const bv = b.card.rank === 'A' && orient.aceHigh ? 14 : RANK_ORDER[b.card.rank];
+    return av - bv;
+  });
+  return out;
+}
+
 /** Insertion helper: keeps runs sorted, respecting current ace orientation. */
 export function insertIntoMeld(
   meld: Meld,
@@ -123,14 +136,7 @@ export function insertIntoMeld(
   if (meld.kind === 'set') {
     return { ...meld, cards: [...meld.cards, mc] };
   }
-  const next = [...meld.cards, mc];
-  const orient = runOrientation(next.map((m) => m.card)) ?? { aceHigh: false };
-  next.sort((a, b) => {
-    const av = a.card.rank === 'A' && orient.aceHigh ? 14 : RANK_ORDER[a.card.rank];
-    const bv = b.card.rank === 'A' && orient.aceHigh ? 14 : RANK_ORDER[b.card.rank];
-    return av - bv;
-  });
-  return { ...meld, cards: next };
+  return { ...meld, cards: sortRunCards([...meld.cards, mc]) };
 }
 
 export function pickCardsByIds(hand: Card[], ids: string[]): Card[] | null {

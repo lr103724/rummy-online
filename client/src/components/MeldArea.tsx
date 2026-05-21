@@ -72,16 +72,24 @@ export function MeldArea({ state, selectedCardIds, onMeldClick, callableMeldIds,
                 layoffable ? 'ring-2 ring-amber-300 rounded drop-shadow-[0_0_8px_rgba(252,211,77,0.7)]' : ''
               }`}
             >
-              {m.cards.map((mc, ci) => (
-                <FlipCard
-                  key={mc.card.id}
-                  id={mc.card.id}
-                  popIn={popInIds.has(mc.card.id)}
-                  style={{ zIndex: ci + 1 }}
-                >
-                  <Card card={mc.card} small />
-                </FlipCard>
-              ))}
+              {m.cards.map((mc, ci) => {
+                const placedByMe = mc.placedBy === state.you.id;
+                return (
+                  <FlipCard
+                    key={mc.card.id}
+                    id={mc.card.id}
+                    popIn={popInIds.has(mc.card.id)}
+                    style={{ zIndex: ci + 1 }}
+                  >
+                    <div className="relative" title={placedByMe ? 'You placed this card' : undefined}>
+                      <Card card={mc.card} small />
+                      {placedByMe && (
+                        <div className="absolute -bottom-1.5 left-1 right-1 h-1 bg-amber-400 rounded-full shadow-[0_0_4px_rgba(252,211,77,0.7)]" />
+                      )}
+                    </div>
+                  </FlipCard>
+                );
+              })}
             </div>
           </div>
         );

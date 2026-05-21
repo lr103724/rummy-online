@@ -98,8 +98,7 @@ describe('RoomManager game flow', () => {
     expect(v2.turnIndex).toBe(1);
   });
 
-  it('boathouse: cannot meld all remaining cards (must keep one to discard)', () => {
-    // Hand-craft a player with exactly 3 cards forming a valid set; melding should fail.
+  it('going out by melding the entire hand ends the round', () => {
     const { mgr } = makeMgr();
     const a = mgr.createRoom('A');
     mgr.joinRoom(a.roomCode, 'B');
@@ -111,7 +110,33 @@ describe('RoomManager game flow', () => {
       { id: 'C-7-1', suit: 'C', rank: '7' },
     ];
     raw.phase = 'meld';
-    expect(() => mgr.meld(a.roomCode, a.playerId, ['H-7-1', 'D-7-1', 'C-7-1'])).toThrow(/BOATHOUSE/);
+    mgr.meld(a.roomCode, a.playerId, ['H-7-1', 'D-7-1', 'C-7-1']);
+    const v = mgr.getStateFor(a.roomCode, a.playerId)!;
+    expect(['roundEnd', 'gameEnd']).toContain(v.phase);
+    expect(v.lastRoundSummary).toBeDefined();
+  });
+
+  it('going out by lay-off ends the round', () => {
+    const { mgr } = makeMgr();
+    const a = mgr.createRoom('A');
+    mgr.joinRoom(a.roomCode, 'B');
+    mgr.startGame(a.roomCode, a.playerId);
+    const raw = mgr.getRawState(a.roomCode)!;
+    raw.players[0]!.hand = [{ id: 'S-8-1', suit: 'S', rank: '8' }];
+    raw.melds = [{
+      id: 'r1', ownerId: a.playerId, kind: 'run',
+      cards: [
+        { card: { id: 'S-5-1', suit: 'S', rank: '5' }, placedBy: a.playerId },
+        { card: { id: 'S-6-1', suit: 'S', rank: '6' }, placedBy: a.playerId },
+        { card: { id: 'S-7-1', suit: 'S', rank: '7' }, placedBy: a.playerId },
+      ],
+    }];
+    raw.phase = 'meld';
+    raw.turnIndex = 0;
+    mgr.layOff(a.roomCode, a.playerId, 'S-8-1', 'r1');
+    const v = mgr.getStateFor(a.roomCode, a.playerId)!;
+    expect(['roundEnd', 'gameEnd']).toContain(v.phase);
+    expect(v.lastRoundSummary).toBeDefined();
   });
 
   it('going out via discard ends the round and records summary', () => {
