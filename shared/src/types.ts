@@ -59,7 +59,7 @@ export interface RoomOptions {
   /** Cards dealt per player at the start of each round. 0 = automatic (13 for 2 players, 7 for 3+). */
   startingHandSize: number;
   /** Boathouse rule: when on, you must discard on the turn you go out.
-   *  You can't meld or lay off your last card. Default: off (more permissive). */
+   *  You can't meld or lay off your last card. Default: on. */
   boathouseRule: boolean;
 }
 
@@ -70,7 +70,7 @@ export const DEFAULT_OPTIONS: RoomOptions = {
   simplifiedScoring: false,
   numDecks: 1,
   startingHandSize: 0,
-  boathouseRule: false,
+  boathouseRule: true,
 };
 
 export interface GameState {

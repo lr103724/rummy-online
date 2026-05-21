@@ -113,9 +113,9 @@ describe('RoomManager game flow', () => {
     expect(() => mgr.meld(a.roomCode, a.playerId, ['H-7-1', 'D-7-1', 'C-7-1'])).toThrow(/BOATHOUSE/);
   });
 
-  it('going out by melding the entire hand ends the round', () => {
+  it('with boathouseRule off, going out by melding the entire hand ends the round', () => {
     const { mgr } = makeMgr();
-    const a = mgr.createRoom('A');
+    const a = mgr.createRoom('A', { boathouseRule: false });
     mgr.joinRoom(a.roomCode, 'B');
     mgr.startGame(a.roomCode, a.playerId);
     const raw = mgr.getRawState(a.roomCode)!;
@@ -131,9 +131,9 @@ describe('RoomManager game flow', () => {
     expect(v.lastRoundSummary).toBeDefined();
   });
 
-  it('going out by lay-off ends the round', () => {
+  it('with boathouseRule off, going out by lay-off ends the round', () => {
     const { mgr } = makeMgr();
-    const a = mgr.createRoom('A');
+    const a = mgr.createRoom('A', { boathouseRule: false });
     mgr.joinRoom(a.roomCode, 'B');
     mgr.startGame(a.roomCode, a.playerId);
     const raw = mgr.getRawState(a.roomCode)!;

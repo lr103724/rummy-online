@@ -24,7 +24,7 @@ export function Home() {
   const [simplifiedScoring, setSimplifiedScoring] = useState(false);
   const [numDecks, setNumDecks] = useState(1);
   const [startingHandSize, setStartingHandSize] = useState(0); // 0 = auto
-  const [boathouseRule, setBoathouseRule] = useState(false);
+  const [boathouseRule, setBoathouseRule] = useState(true);
 
   useEffect(() => {
     attach();
@@ -232,8 +232,8 @@ export function Home() {
                 <div>
                   <div className="text-sm">Boathouse rule</div>
                   <div className="text-[11px] text-zinc-400">
-                    When on, you must <span className="font-semibold">discard</span> on the turn you go out — you
-                    can't end the round by melding or laying off your last card. Off (default) lets you go out any way.
+                    On (default): you must <span className="font-semibold">discard</span> on the turn you go out —
+                    you can't end the round by melding or laying off your last card. Turn off to allow going out any way.
                   </div>
                 </div>
               </label>
